@@ -242,8 +242,9 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const post = blogPosts[params.slug as keyof typeof blogPosts];
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = blogPosts[slug as keyof typeof blogPosts];
   
   if (!post) {
     notFound();
@@ -350,10 +351,10 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Related Articles</h2>
             <div className="grid md:grid-cols-2 gap-8">
               {Object.entries(blogPosts)
-                .filter(([slug]) => slug !== params.slug)
+                .filter(([postSlug]) => postSlug !== slug)
                 .slice(0, 2)
-                .map(([slug, relatedPost]) => (
-                  <Link key={slug} href={`/insights/blog/${slug}`} className="group">
+                .map(([postSlug, relatedPost]) => (
+                  <Link key={postSlug} href={`/insights/blog/${postSlug}`} className="group">
                     <article className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                       <div className="relative h-48">
                         <img 
